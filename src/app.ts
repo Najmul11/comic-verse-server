@@ -3,6 +3,7 @@ import cors from 'cors';
 import httpStatus from 'http-status';
 import config from './config';
 import cookieParser from 'cookie-parser';
+import globalErrorhandler from './app/middlewares/globalErrorHandler';
 
 import { routes } from './app/routes';
 
@@ -21,6 +22,9 @@ app.use('/api/v1', routes);
 app.get('/', (req: Request, res: Response) => {
   res.send(`Comic-verse Server running on port ${config.port}`);
 });
+
+// middleware
+app.use(globalErrorhandler);
 
 // handle not found
 app.use((req: Request, res: Response, next: NextFunction) => {
