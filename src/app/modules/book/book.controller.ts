@@ -33,6 +33,18 @@ const getAllBooks = catchAsyncError(async (req: Request, res: Response) => {
   });
 });
 
+const getSingleBook = catchAsyncError(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await BookService.getSingleBook(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'All books retrieved successfully',
+    data: result,
+  });
+});
+
 const updateBook = catchAsyncError(async (req: Request, res: Response) => {
   const { id } = req.params;
   const payload: Partial<IBook> = req.body;
@@ -66,4 +78,5 @@ export const BookController = {
   getAllBooks,
   updateBook,
   deleteBook,
+  getSingleBook,
 };
