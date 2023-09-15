@@ -26,7 +26,7 @@ const createUser = async (
     throw new ApiError(httpStatus.BAD_REQUEST, 'User already exist');
 
   let avatarUrl = '';
-  if (avatar) avatarUrl = await cloudinaryHelper(avatar);
+  if (avatar) avatarUrl = await cloudinaryHelper(avatar, 'comic-verse/avatars');
 
   user.avatar = avatarUrl;
   const result = await User.create(user);

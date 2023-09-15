@@ -4,7 +4,10 @@ import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
 
-const cloudinaryHelper = async (avatar: Express.Multer.File | undefined) => {
+const cloudinaryHelper = async (
+  avatar: Express.Multer.File | undefined,
+  folder: string,
+) => {
   try {
     const unlinkAsync = promisify(fs.unlink);
 
@@ -17,7 +20,9 @@ const cloudinaryHelper = async (avatar: Express.Multer.File | undefined) => {
       fs.writeFileSync(tempFilePath, avatar.buffer);
 
       // Upload the temporary file to Cloudinary
-      const result = await cloudinary.uploader.upload(tempFilePath);
+      const result = await cloudinary.uploader.upload(tempFilePath, {
+        folder: folder,
+      });
       imageURI = result.secure_url;
 
       // Delete the temporary file
