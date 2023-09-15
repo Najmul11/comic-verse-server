@@ -54,7 +54,7 @@ const updateBook = async (
   id: string,
   payload: Partial<IBook>,
   bookCover: Express.Multer.File | undefined,
-) => {
+): Promise<IBook | null> => {
   const book = await Book.findById(id);
   if (!book)
     throw new ApiError(httpStatus.NOT_FOUND, 'Could not find the book');
@@ -72,8 +72,21 @@ const updateBook = async (
   return result;
 };
 
+const deleteBook = async (id: string): Promise<IBook | null> => {
+  const book = await Book.findById(id);
+  if (!book)
+    throw new ApiError(httpStatus.NOT_FOUND, 'Could not find the book');
+
+  const imagePublicId = book.bookCover!.publicId;
+  await cloudinaryHelper.deleteFromCloudinary(imagePublicId);
+
+  const result = await Book.findByIdAndDelete(id);
+  return result;
+};
+
 export const BookService = {
   createBook,
   getAllBooks,
   updateBook,
+  deleteBook,
 };
