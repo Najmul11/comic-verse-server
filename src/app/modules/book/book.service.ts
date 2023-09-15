@@ -1,12 +1,13 @@
+/* eslint-disable no-console */
 /* eslint-disable no-undef */
 import httpStatus from 'http-status';
-import cloudinaryHelper from '../../../cloudinary/cloudinaryHelper';
 import ApiError from '../../../errors/ApiError';
 import { IBook } from './book.interface';
 import { Book } from './book.model';
 import { IGenericServiceResponse } from '../../../interfaces/serviceResponse';
 import { paginationHelpers } from '../../../pagination/paginationHelpers';
 import { IPaginationOptions } from '../../../pagination/pagination.interface';
+import { cloudinaryHelper } from '../../../cloudinary/cloudinaryHelper';
 
 const createBook = async (
   book: IBook,
@@ -19,7 +20,7 @@ const createBook = async (
   if (!bookCover)
     throw new ApiError(httpStatus.BAD_REQUEST, 'All fields are required');
 
-  const bookCoverUrl = await cloudinaryHelper(
+  const bookCoverUrl = await cloudinaryHelper.uploadToCloudinary(
     bookCover,
     'comic-verse/book-cover',
   );
@@ -49,7 +50,30 @@ const getAllBooks = async (
   };
 };
 
+const updateBook = async (
+  id: string,
+  payload: Partial<IBook>,
+  bookCover: Express.Multer.File | undefined,
+) => {
+  const book = await Book.findById(id);
+  if (!book)
+    throw new ApiError(httpStatus.NOT_FOUND, 'Could not find the book');
+
+  if (bookCover) {
+    const imagePublicId = book.bookCover!.publicId;
+    await cloudinaryHelper.deleteFromCloudinary(imagePublicId);
+    payload.bookCover = await cloudinaryHelper.uploadToCloudinary(
+      bookCover,
+      'comic-verse/book-cover',
+    );
+  }
+
+  const result = await Book.findByIdAndUpdate(id, payload, { new: true });
+  return result;
+};
+
 export const BookService = {
   createBook,
   getAllBooks,
+  updateBook,
 };

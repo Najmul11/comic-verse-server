@@ -28,7 +28,12 @@ const UserSchema = new Schema<IUser, Record<string, unknown>, IUserMethods>(
       required: true,
     },
     avatar: {
-      type: String,
+      publicId: {
+        type: String,
+      },
+      photoUrl: {
+        type: String,
+      },
     },
     wishlist: {
       type: [String],

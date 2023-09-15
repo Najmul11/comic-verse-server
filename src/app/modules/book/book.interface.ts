@@ -5,9 +5,14 @@ type IReview = {
   reviewer: Types.ObjectId;
 };
 
+type IBookCover = {
+  publicId: string;
+  photoUrl: string;
+};
+
 export type IBook = {
   title: string;
-  bookCover: string;
+  bookCover: IBookCover | null;
   author: string;
   genre: string;
   listedBy: Types.ObjectId;

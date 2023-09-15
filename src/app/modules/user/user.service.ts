@@ -2,7 +2,6 @@
 /* eslint-disable no-undef */
 import { IUser, IUserLogin } from './user.interface';
 import { User } from './user.model';
-import cloudinaryHelper from '../../../cloudinary/cloudinaryHelper';
 import ApiError from '../../../errors/ApiError';
 import httpStatus from 'http-status';
 import {
@@ -12,6 +11,7 @@ import {
 import { jwtHelpers } from '../../../jwt/jwtHelper';
 import config from '../../../config';
 import { Secret } from 'jsonwebtoken';
+import { cloudinaryHelper } from '../../../cloudinary/cloudinaryHelper';
 
 const createUser = async (
   user: IUser,
@@ -25,10 +25,14 @@ const createUser = async (
   if (userExist)
     throw new ApiError(httpStatus.BAD_REQUEST, 'User already exist');
 
-  let avatarUrl = '';
-  if (avatar) avatarUrl = await cloudinaryHelper(avatar, 'comic-verse/avatars');
+  let avatarUrl = null;
+  if (avatar)
+    avatarUrl = await cloudinaryHelper.uploadToCloudinary(
+      avatar,
+      'comic-verse/avatars',
+    );
 
-  user.avatar = avatarUrl;
+  user.avatar = avatarUrl!;
   const result = await User.create(user);
 
   const sanitizedResult = await User.findById(result._id)

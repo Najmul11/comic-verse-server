@@ -4,14 +4,14 @@ import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
 
-const cloudinaryHelper = async (
+const uploadToCloudinary = async (
   avatar: Express.Multer.File | undefined,
   folder: string,
 ) => {
   try {
     const unlinkAsync = promisify(fs.unlink);
 
-    let imageURI: string = '';
+    let uploadedImageInfo = null;
 
     if (avatar) {
       // Create a temporary file from the Buffer
@@ -23,16 +23,31 @@ const cloudinaryHelper = async (
       const result = await cloudinary.uploader.upload(tempFilePath, {
         folder: folder,
       });
-      imageURI = result.secure_url;
+
+      uploadedImageInfo = {
+        publicId: result.public_id,
+        photoUrl: result.secure_url,
+      };
 
       // Delete the temporary file
       await unlinkAsync(tempFilePath);
     }
 
-    return imageURI;
+    return uploadedImageInfo;
   } catch (error) {
     throw new Error('Error uploading avatar to Cloudinary');
   }
 };
 
-export default cloudinaryHelper;
+const deleteFromCloudinary = async (publicId: string): Promise<void> => {
+  try {
+    await cloudinary.uploader.destroy(publicId);
+  } catch (error) {
+    throw new Error('Error uploading avatar to Cloudinary');
+  }
+};
+
+export const cloudinaryHelper = {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+};

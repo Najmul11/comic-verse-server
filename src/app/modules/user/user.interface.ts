@@ -3,12 +3,17 @@ import { Model, Types } from 'mongoose';
 
 export type IWishlist = Types.ObjectId;
 
+type IAvatar = {
+  publicId: string;
+  photoUrl: string;
+};
+
 export type IUser = {
   _id?: Types.ObjectId | undefined | null;
   email: string;
   password: string;
   name: string;
-  avatar: string;
+  avatar: IAvatar;
   wishlist?: IWishlist[];
 };
 

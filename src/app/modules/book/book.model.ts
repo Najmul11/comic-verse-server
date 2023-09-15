@@ -8,8 +8,14 @@ const BookSchema = new Schema<IBook, Record<string, unknown>>(
       required: true,
     },
     bookCover: {
-      type: String,
-      required: true,
+      publicId: {
+        type: String,
+        required: true,
+      },
+      photoUrl: {
+        type: String,
+        required: true,
+      },
     },
     author: {
       type: String,
