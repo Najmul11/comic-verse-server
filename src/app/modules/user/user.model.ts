@@ -18,6 +18,9 @@ const UserSchema = new Schema<IUser, Record<string, unknown>>({
     type: String,
     required: true,
   },
+  avatar: {
+    type: String,
+  },
   wishlist: {
     type: [String],
   },

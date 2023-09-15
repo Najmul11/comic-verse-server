@@ -1,8 +1,9 @@
 import express from 'express';
 import { UserController } from './user.controller';
+import singleUpload from '../../middlewares/multer';
 
 const router = express.Router();
 
-router.post('/signup', UserController.createUser);
+router.post('/signup', singleUpload, UserController.createUser);
 
 export const UserRoutes = router;

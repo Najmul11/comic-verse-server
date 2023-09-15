@@ -6,6 +6,7 @@ export type IUser = {
   email: string;
   password: string;
   name: string;
+  avatar: string;
   wishlist?: IWishlist[];
 };
 
