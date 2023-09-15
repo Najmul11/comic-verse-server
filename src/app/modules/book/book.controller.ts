@@ -3,6 +3,8 @@ import catchAsyncError from '../../../shared/catchAsyncError';
 import { BookService } from './book.service';
 import sendResponse from '../../../shared/sendResponse';
 import httpStatus from 'http-status';
+import pick from '../../../shared/pick';
+import { paginationFields } from '../../../pagination/pagination.constant';
 
 const createBook = catchAsyncError(async (req: Request, res: Response) => {
   const book = req.body;
@@ -18,6 +20,19 @@ const createBook = catchAsyncError(async (req: Request, res: Response) => {
   });
 });
 
+const getAllBooks = catchAsyncError(async (req: Request, res: Response) => {
+  const paginationOptions = pick(req.query, paginationFields);
+  const result = await BookService.getAllBooks(paginationOptions);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'All books retrieved successfully',
+    data: result,
+  });
+});
+
 export const BookController = {
   createBook,
+  getAllBooks,
 };

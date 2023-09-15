@@ -4,6 +4,9 @@ import cloudinaryHelper from '../../../cloudinary/cloudinaryHelper';
 import ApiError from '../../../errors/ApiError';
 import { IBook } from './book.interface';
 import { Book } from './book.model';
+import { IGenericServiceResponse } from '../../../interfaces/serviceResponse';
+import { paginationHelpers } from '../../../pagination/paginationHelpers';
+import { IPaginationOptions } from '../../../pagination/pagination.interface';
 
 const createBook = async (
   book: IBook,
@@ -27,6 +30,26 @@ const createBook = async (
   return result;
 };
 
+const getAllBooks = async (
+  paginationOptions: IPaginationOptions,
+): Promise<IGenericServiceResponse<IBook[]>> => {
+  const { page, limit, skip } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const result = await Book.find({}).skip(skip).limit(limit);
+
+  const total = await Book.countDocuments();
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
 export const BookService = {
   createBook,
+  getAllBooks,
 };

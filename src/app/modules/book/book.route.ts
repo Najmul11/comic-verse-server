@@ -5,5 +5,6 @@ import { BookController } from './book.controller';
 const router = express.Router();
 
 router.post('/list-book', singleUpload, BookController.createBook);
+router.get('/', BookController.getAllBooks);
 
 export const BookRoute = router;
