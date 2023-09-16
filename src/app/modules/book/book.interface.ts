@@ -15,7 +15,7 @@ export type IBook = {
   bookCover: IBookCover | null;
   author: string;
   genre: string;
-  listedBy: Types.ObjectId;
+  listedBy: Types.ObjectId | string;
   publishedDate: Date;
   reviews?: IReview[];
 };

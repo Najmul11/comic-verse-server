@@ -8,12 +8,15 @@ import { IGenericServiceResponse } from '../../../interfaces/serviceResponse';
 import { paginationHelpers } from '../../../pagination/paginationHelpers';
 import { IPaginationOptions } from '../../../pagination/pagination.interface';
 import { cloudinaryHelper } from '../../../cloudinary/cloudinaryHelper';
+import { Types } from 'mongoose';
 
 const createBook = async (
-  book: IBook,
+  book: Partial<IBook>,
   bookCover: Express.Multer.File | undefined,
+  listedBy: string,
 ): Promise<IBook | null> => {
-  const { author, title, listedBy, publishedDate } = book;
+  const { author, title, publishedDate } = book;
+
   if (!author || !title || !listedBy || !publishedDate)
     throw new ApiError(httpStatus.BAD_REQUEST, 'All fields are required');
 
@@ -26,6 +29,7 @@ const createBook = async (
   );
 
   book.bookCover = bookCoverUrl;
+  book.listedBy = listedBy;
 
   const result = await Book.create(book);
   return result;
@@ -92,6 +96,7 @@ const deleteBook = async (id: string): Promise<IBook | null> => {
 const postReview = async (
   bookId: string,
   payload: Partial<IReview>,
+  id: string,
 ): Promise<IBook | null> => {
   const book = await Book.findById(bookId);
   if (!book)
@@ -99,7 +104,7 @@ const postReview = async (
 
   const query = {
     _id: bookId,
-    'reviews.reviewer': payload.reviewer,
+    'reviews.reviewer': id,
   };
 
   const updatedReview = {
@@ -114,6 +119,9 @@ const postReview = async (
   }).populate('reviews.reviewer', 'name avatar.photoUrl ');
 
   if (!existingReview) {
+    payload.reviewer = new Types.ObjectId(id);
+    console.log(payload);
+
     const review = {
       $push: {
         reviews: payload,
@@ -133,15 +141,19 @@ const postReview = async (
 
 const deleteReview = async (
   bookId: string,
-  payload: Partial<IReview>,
+  id: string,
 ): Promise<IBook | null> => {
+  const book = await Book.findById(bookId);
+  if (!book)
+    throw new ApiError(httpStatus.NOT_FOUND, 'Could not find the book');
+
   const query = {
     _id: bookId,
-    'reviews.reviewer': payload.reviewer,
+    'reviews.reviewer': id,
   };
 
   const update = {
-    $pull: { reviews: { reviewer: payload.reviewer } },
+    $pull: { reviews: { reviewer: id } },
   };
 
   const options = {

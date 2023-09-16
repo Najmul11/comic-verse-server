@@ -10,8 +10,9 @@ import { IBook, IReview } from './book.interface';
 const createBook = catchAsyncError(async (req: Request, res: Response) => {
   const book = req.body;
   const bookCover = req.file;
+  const user = req.user;
 
-  const result = await BookService.createBook(book, bookCover);
+  const result = await BookService.createBook(book, bookCover, user?._id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -35,12 +36,13 @@ const getAllBooks = catchAsyncError(async (req: Request, res: Response) => {
 
 const getSingleBook = catchAsyncError(async (req: Request, res: Response) => {
   const { id } = req.params;
+
   const result = await BookService.getSingleBook(id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'All books retrieved successfully',
+    message: 'Book retrieved successfully',
     data: result,
   });
 });
@@ -76,8 +78,9 @@ const deleteBook = catchAsyncError(async (req: Request, res: Response) => {
 const postReview = catchAsyncError(async (req: Request, res: Response) => {
   const { id } = req.params;
   const payload: IReview = req.body;
+  const user = req.user;
 
-  const result = await BookService.postReview(id, payload);
+  const result = await BookService.postReview(id, payload, user?._id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -89,9 +92,9 @@ const postReview = catchAsyncError(async (req: Request, res: Response) => {
 
 const deleteReview = catchAsyncError(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const payload: Partial<IReview> = req.body;
+  const user = req.user;
 
-  const result = await BookService.deleteReview(id, payload);
+  const result = await BookService.deleteReview(id, user?._id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
