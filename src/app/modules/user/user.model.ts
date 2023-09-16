@@ -22,6 +22,7 @@ const UserSchema = new Schema<IUser, Record<string, unknown>, IUserMethods>(
     password: {
       type: String,
       required: true,
+      select: false,
     },
     name: {
       type: String,
@@ -35,9 +36,12 @@ const UserSchema = new Schema<IUser, Record<string, unknown>, IUserMethods>(
         type: String,
       },
     },
-    wishlist: {
-      type: [String],
-    },
+    wishlist: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Book',
+      },
+    ],
   },
   {
     timestamps: true,

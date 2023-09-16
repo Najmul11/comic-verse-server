@@ -6,6 +6,10 @@ import { Uservalidation } from './user.validation';
 
 const router = express.Router();
 
+router.patch('/wishlist/delete/:id', UserController.deleteFromWishlist);
+
+router.patch('/wishlist/:id', UserController.addToWishlist);
+
 router.post('/signup', singleUpload, UserController.createUser);
 
 router.post(

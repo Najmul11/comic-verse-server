@@ -64,8 +64,39 @@ const refreshToken = catchAsyncError(async (req: Request, res: Response) => {
   });
 });
 
+const addToWishlist = catchAsyncError(async (req: Request, res: Response) => {
+  const { id: bookId } = req.params;
+  const { id } = req.body;
+
+  const result = await UserService.addToWishlist(bookId, id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Book added to wishlist',
+    data: result,
+  });
+});
+const deleteFromWishlist = catchAsyncError(
+  async (req: Request, res: Response) => {
+    const { id: bookId } = req.params;
+    const { id } = req.body;
+
+    const result = await UserService.deleteFromWishlist(bookId, id);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Book removed from  wishlist',
+      data: result,
+    });
+  },
+);
+
 export const UserController = {
   createUser,
   loginUser,
   refreshToken,
+  addToWishlist,
+  deleteFromWishlist,
 };
