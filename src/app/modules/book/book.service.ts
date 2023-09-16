@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
-import { IBook } from './book.interface';
+import { IBook, IReview } from './book.interface';
 import { Book } from './book.model';
 import { IGenericServiceResponse } from '../../../interfaces/serviceResponse';
 import { paginationHelpers } from '../../../pagination/paginationHelpers';
@@ -89,10 +89,53 @@ const deleteBook = async (id: string): Promise<IBook | null> => {
   return result;
 };
 
+const postReview = async (
+  bookId: string,
+  payload: Partial<IReview>,
+): Promise<IBook | null> => {
+  const book = await Book.findById(bookId);
+  if (!book)
+    throw new ApiError(httpStatus.NOT_FOUND, 'Could not find the book');
+
+  const query = {
+    _id: bookId,
+    'reviews.reviewer': payload.reviewer,
+  };
+
+  const updatedReview = {
+    $set: {
+      'reviews.$.review': payload.review,
+    },
+  };
+
+  const existingReview = await Book.findOneAndUpdate(query, updatedReview, {
+    new: true,
+    select: { title: 1, reviews: 1 },
+  }).populate('reviews.reviewer', 'name avatar.photoUrl ');
+
+  if (!existingReview) {
+    const review = {
+      $push: {
+        reviews: payload,
+      },
+    };
+
+    const result = await Book.findByIdAndUpdate(bookId, review, {
+      new: true,
+      select: { title: 1, reviews: 1 },
+    }).populate('reviews.reviewer', 'name avatar.photoUrl ');
+
+    return result;
+  }
+
+  return existingReview;
+};
+
 export const BookService = {
   createBook,
   getAllBooks,
   updateBook,
   deleteBook,
   getSingleBook,
+  postReview,
 };

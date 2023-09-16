@@ -4,6 +4,8 @@ import { BookController } from './book.controller';
 
 const router = express.Router();
 
+router.patch('/reviews/:id', BookController.postReview);
+
 router.patch('/:id', singleUpload, BookController.updateBook);
 
 router.get('/:id', BookController.getSingleBook);

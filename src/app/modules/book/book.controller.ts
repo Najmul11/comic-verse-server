@@ -5,7 +5,7 @@ import sendResponse from '../../../shared/sendResponse';
 import httpStatus from 'http-status';
 import pick from '../../../shared/pick';
 import { paginationFields } from '../../../pagination/pagination.constant';
-import { IBook } from './book.interface';
+import { IBook, IReview } from './book.interface';
 
 const createBook = catchAsyncError(async (req: Request, res: Response) => {
   const book = req.body;
@@ -73,10 +73,25 @@ const deleteBook = catchAsyncError(async (req: Request, res: Response) => {
   });
 });
 
+const postReview = catchAsyncError(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const payload: IReview = req.body;
+
+  const result = await BookService.postReview(id, payload);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'You have succeeded reviewing the book',
+    data: result,
+  });
+});
+
 export const BookController = {
   createBook,
   getAllBooks,
   updateBook,
   deleteBook,
   getSingleBook,
+  postReview,
 };

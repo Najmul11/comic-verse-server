@@ -1,8 +1,8 @@
 import { Model, Types } from 'mongoose';
 
-type IReview = {
-  review: string;
-  reviewer: Types.ObjectId;
+export type IReview = {
+  review: string | undefined;
+  reviewer: Types.ObjectId | undefined;
 };
 
 type IBookCover = {
