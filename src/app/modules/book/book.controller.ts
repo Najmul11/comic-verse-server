@@ -87,6 +87,20 @@ const postReview = catchAsyncError(async (req: Request, res: Response) => {
   });
 });
 
+const deleteReview = catchAsyncError(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const payload: Partial<IReview> = req.body;
+
+  const result = await BookService.deleteReview(id, payload);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Review deleted successfully',
+    data: result,
+  });
+});
+
 export const BookController = {
   createBook,
   getAllBooks,
@@ -94,4 +108,5 @@ export const BookController = {
   deleteBook,
   getSingleBook,
   postReview,
+  deleteReview,
 };

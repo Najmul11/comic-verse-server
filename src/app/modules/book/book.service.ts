@@ -131,6 +131,33 @@ const postReview = async (
   return existingReview;
 };
 
+const deleteReview = async (
+  bookId: string,
+  payload: Partial<IReview>,
+): Promise<IBook | null> => {
+  const query = {
+    _id: bookId,
+    'reviews.reviewer': payload.reviewer,
+  };
+
+  const update = {
+    $pull: { reviews: { reviewer: payload.reviewer } },
+  };
+
+  const options = {
+    new: true,
+    select: { title: 1, reviews: 1 },
+  };
+
+  const updatedBook = await Book.findOneAndUpdate(
+    query,
+    update,
+    options,
+  ).populate('reviews.reviewer', 'name avatar.photoUrl');
+
+  return updatedBook;
+};
+
 export const BookService = {
   createBook,
   getAllBooks,
@@ -138,4 +165,5 @@ export const BookService = {
   deleteBook,
   getSingleBook,
   postReview,
+  deleteReview,
 };
