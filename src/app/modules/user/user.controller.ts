@@ -66,9 +66,10 @@ const refreshToken = catchAsyncError(async (req: Request, res: Response) => {
 
 const addToWishlist = catchAsyncError(async (req: Request, res: Response) => {
   const { id: bookId } = req.params;
-  const { id } = req.body;
 
-  const result = await UserService.addToWishlist(bookId, id);
+  const user = req.user;
+
+  const result = await UserService.addToWishlist(bookId, user?._id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -77,12 +78,13 @@ const addToWishlist = catchAsyncError(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const deleteFromWishlist = catchAsyncError(
   async (req: Request, res: Response) => {
     const { id: bookId } = req.params;
-    const { id } = req.body;
+    const user = req.user;
 
-    const result = await UserService.deleteFromWishlist(bookId, id);
+    const result = await UserService.deleteFromWishlist(bookId, user?._id);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

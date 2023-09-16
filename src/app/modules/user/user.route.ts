@@ -3,12 +3,13 @@ import { UserController } from './user.controller';
 import singleUpload from '../../middlewares/multer';
 import validateRequest from '../../middlewares/validateRequest';
 import { Uservalidation } from './user.validation';
+import auth from '../../middlewares/auth';
 
 const router = express.Router();
 
-router.patch('/wishlist/delete/:id', UserController.deleteFromWishlist);
+router.patch('/wishlist/delete/:id', auth, UserController.deleteFromWishlist);
 
-router.patch('/wishlist/:id', UserController.addToWishlist);
+router.patch('/wishlist/:id', auth, UserController.addToWishlist);
 
 router.post('/signup', singleUpload, UserController.createUser);
 

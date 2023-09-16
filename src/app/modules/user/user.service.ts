@@ -10,7 +10,7 @@ import {
 } from '../../../jwt/jwt.interface';
 import { jwtHelpers } from '../../../jwt/jwtHelper';
 import config from '../../../config';
-import { Secret } from 'jsonwebtoken';
+import { JwtPayload, Secret } from 'jsonwebtoken';
 import { cloudinaryHelper } from '../../../cloudinary/cloudinaryHelper';
 import { Types } from 'mongoose';
 import { Book } from '../book/book.model';
@@ -117,12 +117,12 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
 
 const addToWishlist = async (
   bookId: string,
-  id: string,
+  userId: JwtPayload | null,
 ): Promise<IUser | null> => {
   const book = await Book.findById(bookId);
   if (!book) throw new ApiError(httpStatus.NOT_FOUND, "Couln't find book");
 
-  const user = await User.findById(id);
+  const user = await User.findById(userId);
   if (!user) throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
 
   const bookObjectId = new Types.ObjectId(bookId);
@@ -139,27 +139,35 @@ const addToWishlist = async (
     },
   };
 
-  const result = await User.findByIdAndUpdate(id, wish, { new: true })
+  const result = await User.findByIdAndUpdate(userId, wish, { new: true })
     .select('-password')
     .populate('wishlist');
   return result;
 };
+
 const deleteFromWishlist = async (
   bookId: string,
-  id: string,
+  userId: JwtPayload | null,
 ): Promise<IUser | null> => {
   const book = await Book.findById(bookId);
   if (!book) throw new ApiError(httpStatus.NOT_FOUND, "Couln't find book");
 
-  const wish = {
-    $pull: {
-      wishlist: bookId,
-    },
-  };
+  const user = await User.findById(userId);
+  if (!user) throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
 
-  const result = await User.findByIdAndUpdate(id, wish, { new: true })
-    .select('-password')
-    .populate('wishlist');
+  const bookObjectId = new Types.ObjectId(bookId);
+  let result = null;
+  if (user.wishlist?.includes(bookObjectId)) {
+    const wish = {
+      $pull: {
+        wishlist: bookId,
+      },
+    };
+
+    result = await User.findByIdAndUpdate(userId, wish, { new: true })
+      .select('-password')
+      .populate('wishlist');
+  }
   return result;
 };
 
