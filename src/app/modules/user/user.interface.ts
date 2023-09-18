@@ -5,7 +5,7 @@ export type IWishlist = Types.ObjectId;
 
 type IAvatar = {
   publicId: string;
-  photoUrl: string;
+  photoUrl: string | undefined;
 };
 
 export type IUser = {
@@ -13,7 +13,7 @@ export type IUser = {
   email: string;
   password: string;
   name: string;
-  avatar: IAvatar;
+  avatar?: IAvatar;
   wishlist?: IWishlist[];
 };
 

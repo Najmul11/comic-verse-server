@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Request, Response } from 'express';
 import catchAsyncError from '../../../shared/catchAsyncError';
 import { BookService } from './book.service';
@@ -79,6 +80,7 @@ const postReview = catchAsyncError(async (req: Request, res: Response) => {
   const { id } = req.params;
   const payload: IReview = req.body;
   const user = req.user;
+  console.log(req.body);
 
   const result = await BookService.postReview(id, payload, user?._id);
 

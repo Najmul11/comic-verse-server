@@ -8,7 +8,7 @@ import { IGenericServiceResponse } from '../../../interfaces/serviceResponse';
 import { paginationHelpers } from '../../../pagination/paginationHelpers';
 import { IPaginationOptions } from '../../../pagination/pagination.interface';
 import { cloudinaryHelper } from '../../../cloudinary/cloudinaryHelper';
-import { Types } from 'mongoose';
+import { SortOrder, Types } from 'mongoose';
 
 const createBook = async (
   book: Partial<IBook>,
@@ -38,10 +38,19 @@ const createBook = async (
 const getAllBooks = async (
   paginationOptions: IPaginationOptions,
 ): Promise<IGenericServiceResponse<IBook[]>> => {
-  const { page, limit, skip } =
+  const { page, limit, skip, sortBy, sortOrder } =
     paginationHelpers.calculatePagination(paginationOptions);
 
-  const result = await Book.find({}).skip(skip).limit(limit);
+  const sortConditions: { [key: string]: SortOrder } = {};
+
+  if (sortBy && sortOrder) {
+    sortConditions[sortBy] = sortOrder;
+  }
+
+  const result = await Book.find({})
+    .sort(sortConditions)
+    .skip(skip)
+    .limit(limit);
 
   const total = await Book.countDocuments();
   return {
@@ -55,7 +64,7 @@ const getAllBooks = async (
 };
 
 const getSingleBook = async (id: string): Promise<IBook | null> => {
-  const result = await Book.findById(id);
+  const result = await Book.findById(id).populate('reviews.reviewer', 'name');
   return result;
 };
 
@@ -120,7 +129,6 @@ const postReview = async (
 
   if (!existingReview) {
     payload.reviewer = new Types.ObjectId(id);
-    console.log(payload);
 
     const review = {
       $push: {
