@@ -15,6 +15,8 @@ const createUser = catchAsyncError(async (req: Request, res: Response) => {
   const user = req.body;
   const avatar = req.file;
 
+  console.log('in controller', avatar);
+
   const result = await UserService.createUser(user, avatar);
 
   sendResponse<IUser>(res, {
@@ -64,6 +66,17 @@ const refreshToken = catchAsyncError(async (req: Request, res: Response) => {
   });
 });
 
+const getProfile = catchAsyncError(async (req: Request, res: Response) => {
+  const user = req.user;
+  const result = await UserService.getProfile(user?._id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Profile retrieved successfully',
+    data: result,
+  });
+});
+
 const addToWishlist = catchAsyncError(async (req: Request, res: Response) => {
   const { id: bookId } = req.params;
 
@@ -101,4 +114,5 @@ export const UserController = {
   refreshToken,
   addToWishlist,
   deleteFromWishlist,
+  getProfile,
 };

@@ -7,6 +7,7 @@ import httpStatus from 'http-status';
 import pick from '../../../shared/pick';
 import { paginationFields } from '../../../pagination/pagination.constant';
 import { IBook, IReview } from './book.interface';
+import { bookFilterableFields } from './book.constant';
 
 const createBook = catchAsyncError(async (req: Request, res: Response) => {
   const book = req.body;
@@ -24,8 +25,10 @@ const createBook = catchAsyncError(async (req: Request, res: Response) => {
 });
 
 const getAllBooks = catchAsyncError(async (req: Request, res: Response) => {
+  const filters = pick(req.query, bookFilterableFields);
   const paginationOptions = pick(req.query, paginationFields);
-  const result = await BookService.getAllBooks(paginationOptions);
+
+  const result = await BookService.getAllBooks(filters, paginationOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -80,7 +83,6 @@ const postReview = catchAsyncError(async (req: Request, res: Response) => {
   const { id } = req.params;
   const payload: IReview = req.body;
   const user = req.user;
-  console.log(req.body);
 
   const result = await BookService.postReview(id, payload, user?._id);
 

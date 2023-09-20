@@ -18,6 +18,7 @@ router.post(
   validateRequest(Uservalidation.userLoginZodSchema),
   UserController.loginUser,
 );
+router.get('/get-profile', auth, UserController.getProfile);
 
 router.post(
   '/refresh-token',

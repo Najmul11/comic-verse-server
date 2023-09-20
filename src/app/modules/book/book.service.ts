@@ -2,26 +2,27 @@
 /* eslint-disable no-undef */
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
-import { IBook, IReview } from './book.interface';
+import { IBook, IBookFilters, IReview } from './book.interface';
 import { Book } from './book.model';
 import { IGenericServiceResponse } from '../../../interfaces/serviceResponse';
 import { paginationHelpers } from '../../../pagination/paginationHelpers';
 import { IPaginationOptions } from '../../../pagination/pagination.interface';
 import { cloudinaryHelper } from '../../../cloudinary/cloudinaryHelper';
 import { SortOrder, Types } from 'mongoose';
+import { bookSearchableFields } from './book.constant';
 
 const createBook = async (
   book: Partial<IBook>,
   bookCover: Express.Multer.File | undefined,
   listedBy: string,
 ): Promise<IBook | null> => {
-  const { author, title, publishedDate } = book;
+  const { author, title, publishedDate, genre } = book;
 
-  if (!author || !title || !listedBy || !publishedDate)
+  if (!author || !title || !listedBy || !publishedDate || !genre)
     throw new ApiError(httpStatus.BAD_REQUEST, 'All fields are required');
 
   if (!bookCover)
-    throw new ApiError(httpStatus.BAD_REQUEST, 'All fields are required');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Please provide a cover photo');
 
   const bookCoverUrl = await cloudinaryHelper.uploadToCloudinary(
     bookCover,
@@ -36,6 +37,7 @@ const createBook = async (
 };
 
 const getAllBooks = async (
+  filters: IBookFilters,
   paginationOptions: IPaginationOptions,
 ): Promise<IGenericServiceResponse<IBook[]>> => {
   const { page, limit, skip, sortBy, sortOrder } =
@@ -47,12 +49,47 @@ const getAllBooks = async (
     sortConditions[sortBy] = sortOrder;
   }
 
-  const result = await Book.find({})
+  const { searchTerm, year, ...filtersData } = filters;
+
+  const andConditions = [];
+
+  if (searchTerm) {
+    andConditions.push({
+      $or: bookSearchableFields.map(field => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: 'i',
+        },
+      })),
+    });
+  }
+
+  if (year && year.length > 0) {
+    // Include a condition to match books with specific years
+    andConditions.push({
+      publishedDate: {
+        $in: year.map(year => new Date(`${year}-01-01T00:00:00.000Z`)),
+      },
+    });
+  }
+
+  if (Object.keys(filtersData).length) {
+    andConditions.push({
+      $and: Object.entries(filtersData).map(([field, value]) => ({
+        [field]: value,
+      })),
+    });
+  }
+
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await Book.find(whereConditions)
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);
 
-  const total = await Book.countDocuments();
+  const total = await Book.countDocuments(whereConditions);
   return {
     meta: {
       page,

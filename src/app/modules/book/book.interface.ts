@@ -20,4 +20,10 @@ export type IBook = {
   reviews?: IReview[];
 };
 
+export type IBookFilters = {
+  searchTerm?: string;
+  genre?: string;
+  year?: number[];
+};
+
 export type Bookmodel = Model<IBook, Record<string, unknown>>;

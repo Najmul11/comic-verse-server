@@ -145,6 +145,16 @@ const addToWishlist = async (
   return result;
 };
 
+const getProfile = async (userId: string) => {
+  const result = await User.findById(userId, {
+    wishlist: 1,
+    avatar: 1,
+    email: 1,
+  }).populate('wishlist', 'bookCover title author');
+
+  return result;
+};
+
 const deleteFromWishlist = async (
   bookId: string,
   userId: JwtPayload | null,
@@ -177,4 +187,5 @@ export const UserService = {
   refreshToken,
   addToWishlist,
   deleteFromWishlist,
+  getProfile,
 };
