@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UserRoutes = void 0;
+const express_1 = __importDefault(require("express"));
+const user_controller_1 = require("./user.controller");
+const multer_1 = __importDefault(require("../../middlewares/multer"));
+const validateRequest_1 = __importDefault(require("../../middlewares/validateRequest"));
+const user_validation_1 = require("./user.validation");
+const auth_1 = __importDefault(require("../../middlewares/auth"));
+const router = express_1.default.Router();
+router.patch('/wishlist/delete/:id', auth_1.default, user_controller_1.UserController.deleteFromWishlist);
+router.patch('/wishlist/:id', auth_1.default, user_controller_1.UserController.addToWishlist);
+router.post('/signup', multer_1.default, user_controller_1.UserController.createUser);
+router.post('/login', (0, validateRequest_1.default)(user_validation_1.Uservalidation.userLoginZodSchema), user_controller_1.UserController.loginUser);
+router.get('/get-profile', auth_1.default, user_controller_1.UserController.getProfile);
+router.post('/refresh-token', (0, validateRequest_1.default)(user_validation_1.Uservalidation.refreshTokenZodSchema), user_controller_1.UserController.refreshToken);
+exports.UserRoutes = router;

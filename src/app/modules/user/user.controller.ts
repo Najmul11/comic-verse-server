@@ -15,8 +15,6 @@ const createUser = catchAsyncError(async (req: Request, res: Response) => {
   const user = req.body;
   const avatar = req.file;
 
-  console.log('in controller', avatar);
-
   const result = await UserService.createUser(user, avatar);
 
   sendResponse<IUser>(res, {

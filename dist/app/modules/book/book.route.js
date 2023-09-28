@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BookRoute = void 0;
+const express_1 = __importDefault(require("express"));
+const multer_1 = __importDefault(require("../../middlewares/multer"));
+const book_controller_1 = require("./book.controller");
+const auth_1 = __importDefault(require("../../middlewares/auth"));
+const specificAuth_1 = __importDefault(require("../../middlewares/specificAuth"));
+const router = express_1.default.Router();
+router.patch('/reviews/delete/:id', auth_1.default, book_controller_1.BookController.deleteReview);
+router.patch('/reviews/:id', auth_1.default, book_controller_1.BookController.postReview);
+router.patch('/:id', auth_1.default, specificAuth_1.default, multer_1.default, book_controller_1.BookController.updateBook);
+router.get('/:id', book_controller_1.BookController.getSingleBook);
+router.delete('/:id', auth_1.default, specificAuth_1.default, book_controller_1.BookController.deleteBook);
+router.post('/list-book', auth_1.default, multer_1.default, book_controller_1.BookController.createBook);
+router.get('/', book_controller_1.BookController.getAllBooks);
+exports.BookRoute = router;
