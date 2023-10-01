@@ -32,7 +32,6 @@ const config_1 = __importDefault(require("../../../config"));
 const createUser = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.body;
     const avatar = req.file;
-    console.log('in controller', avatar);
     const result = yield user_service_1.UserService.createUser(user, avatar);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,

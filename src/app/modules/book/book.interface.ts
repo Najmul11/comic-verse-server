@@ -12,7 +12,7 @@ type IBookCover = {
 
 export type IBook = {
   title: string;
-  bookCover: IBookCover | null;
+  bookCover?: IBookCover | null;
   author: string;
   genre: string;
   listedBy: Types.ObjectId | string;

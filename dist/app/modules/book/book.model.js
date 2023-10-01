@@ -17,6 +17,9 @@ const BookSchema = new mongoose_1.Schema({
             required: true,
         },
     },
+    // imageUrl: {
+    //   type: String,
+    // },
     author: {
         type: String,
         required: true,

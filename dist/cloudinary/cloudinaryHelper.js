@@ -15,28 +15,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.cloudinaryHelper = void 0;
 /* eslint-disable no-undef */
 const cloudinary_1 = require("cloudinary");
-const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
-const util_1 = require("util");
+const dataUri_1 = __importDefault(require("./dataUri"));
 const uploadToCloudinary = (avatar, folder) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const unlinkAsync = (0, util_1.promisify)(fs_1.default.unlink);
         let uploadedImageInfo = null;
         if (avatar) {
-            // Create a temporary file from the Buffer
-            const fileExtension = path_1.default.extname(avatar.originalname);
-            const tempFilePath = `temp-avatar-${Date.now()}${fileExtension}`;
-            fs_1.default.writeFileSync(tempFilePath, avatar.buffer);
-            // Upload the temporary file to Cloudinary
-            const result = yield cloudinary_1.v2.uploader.upload(tempFilePath, {
+            const fileUri = (0, dataUri_1.default)(avatar);
+            const result = yield cloudinary_1.v2.uploader.upload(fileUri, {
                 folder: folder,
             });
             uploadedImageInfo = {
                 publicId: result.public_id,
                 photoUrl: result.secure_url,
             };
-            // Delete the temporary file
-            yield unlinkAsync(tempFilePath);
         }
         return uploadedImageInfo;
     }
@@ -56,3 +47,30 @@ exports.cloudinaryHelper = {
     uploadToCloudinary,
     deleteFromCloudinary,
 };
+// this is the first approach , its not comapatible with vercel/multer
+// async function uploadToCloudinary(avatar: Express.Multer.File | undefined,
+//   folder: string): Promise<{ publicId: string; photoUrl: string; } | null> {
+//   try {
+//     const unlinkAsync = promisify(fs.unlink);
+//     let uploadedImageInfo = null;
+//     if (avatar) {
+//       // Create a temporary file from the Buffer
+//       const fileExtension = path.extname(avatar.originalname);
+//       const tempFilePath = `temp-avatar-${Date.now()}${fileExtension}`;
+//       fs.writeFileSync(tempFilePath, avatar.buffer);
+//       // Upload the temporary file to Cloudinary
+//       const result = await cloudinary.uploader.upload(tempFilePath, {
+//         folder: folder,
+//       });
+//       uploadedImageInfo = {
+//         publicId: result.public_id,
+//         photoUrl: result.secure_url,
+//       };
+//       // Delete the temporary file
+//       await unlinkAsync(tempFilePath);
+//     }
+//     return uploadedImageInfo;
+//   } catch (error) {
+//     throw new Error('Error uploading avatar to Cloudinary');
+//   }
+// }
